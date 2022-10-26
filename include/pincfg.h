@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+#define LED_CAUTION 2
 #define LED_R       12
 #define LED_G       13
 #define LED_B       14

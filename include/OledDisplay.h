@@ -1,10 +1,6 @@
 #ifndef _OledDisplay_h_
 #define _OledDisplay_h_
 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
 //---------- DISPLAY INIT ---------------//
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -16,6 +12,11 @@ class OLED {
 public:
     bool Init(void);
     void IntroScreen(void);
+    void MainScreen(void);
+
+    void DisplayThermal1(float temperature);
+    void DisplayThermal2(float temperature);
+    void DisplaySetpoint(float temperature);
 private:
 };
 

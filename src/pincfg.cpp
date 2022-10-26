@@ -1,7 +1,9 @@
+#include <Arduino.h>
 #include "pincfg.h"
 
 void PINCFG::GPIosetup(void)
 {
+  pinMode(LED_CAUTION, OUTPUT);
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
