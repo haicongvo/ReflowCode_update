@@ -1,10 +1,12 @@
-#include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "OledDisplay.h"
+#include "Temp.h"
+#include "image.h"
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+TEMP TempData;
 
 bool OLED::Init(void)
 {
@@ -154,4 +156,74 @@ void OLED::DisplaySetpoint(float temperature)
     display.print((char)247);
     display.print("C");
     display.display();
+}
+
+void OLED::DisplayTableInfo(void)
+{
+    display.setCursor(92, 12);
+    display.print(TempData.ReflowData.RefHeatTemp);
+    display.setCursor(116, 12);
+    display.print(TempData.ReflowData.RefHeatTime);
+
+    display.setCursor(86, 22);
+    display.print(TempData.ReflowData.RefSoakTemp);
+    //clean value on display
+    display.fillRoundRect(109, 21, 18, 9, 0, SSD1306_BLACK);
+    display.setCursor(112, 22);
+    display.print(TempData.ReflowData.RefSoakTime);
+
+    display.setCursor(92, 32);
+    display.print(TempData.ReflowData.RefRampTemp);
+    display.setCursor(116, 32);
+    display.print(TempData.ReflowData.RefRampTime);
+
+    display.setCursor(86, 42);
+    display.print(TempData.ReflowData.RefReflowTemp);
+    //clean value on display
+    display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_BLACK);
+    display.setCursor(112, 42);
+    display.print(TempData.ReflowData.RefReflowTime);
+}
+
+void OLED::DisplayTimeSoakStatus(uint8_t time)
+{
+    //clean value on display
+    display.fillRoundRect(109, 21, 18, 9, 0, SSD1306_WHITE);
+    //update new value
+    display.setTextColor(SSD1306_BLACK);
+    display.setCursor(112, 22);
+    display.print(time);
+    display.setTextColor(SSD1306_WHITE);
+}
+
+void OLED::DisplayTimeReflowStatus(uint8_t time)
+{
+    //clean value on display
+    display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_WHITE);
+    //update new value
+    display.setTextColor(SSD1306_BLACK);
+    display.setCursor(112, 42);
+    display.print(time);
+    display.setTextColor(SSD1306_WHITE);
+}
+
+void OLED::DisplayFanMonitor(bool enable)
+{
+    display.fillRoundRect(0, 45, 16, 16, 0, SSD1306_BLACK);// clear display area
+    if(enable)
+    {
+        EnableChangeFanIcon = !EnableChangeFanIcon;
+        if(EnableChangeFanIcon) display.drawBitmap(0, 45, cool1, 16, 16, SSD1306_WHITE);
+        else display.drawBitmap(0, 45, cool2, 16, 16, SSD1306_WHITE);
+    }
+    else
+    {
+        display.drawBitmap(0, 45, cool1, 16, 16, SSD1306_WHITE);
+    }
+}
+
+void OLED::DisplayHeatIcon(bool displayicon)
+{
+    if(displayicon) display.drawBitmap(18, 38, warning, 32, 32, SSD1306_WHITE);
+    else display.fillRoundRect(18, 45, 32, 32, 0, SSD1306_BLACK);// clear display area
 }

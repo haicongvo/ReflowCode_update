@@ -1,7 +1,6 @@
-#include <Arduino.h>
 #include "pincfg.h"
 #include "controlPID.h"
-#include "ReadTemp.h"
+#include "Temp.h"
 
 TEMP ReadThermal;
 void PID::PID_control()
@@ -19,8 +18,8 @@ void PID::PID_control()
     Output = (alpha * E + beta * E1 + gamman * E2 + 2 * T * LastOutput) / (2 * T);
 
     LastOutput = Output;
-    E2=E1;
-    E1=E;  
+    E2 = E1;
+    E1 = E;  
     
     if(Output > 255)  Output = 255;
     else if(Output <= 0) Output = 0;

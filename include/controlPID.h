@@ -1,6 +1,8 @@
 #ifndef _controlPID_h_
 #define _controlPID_h_
 
+#include <Arduino.h>
+
 class PID {
 public:
     struct PIDvalue

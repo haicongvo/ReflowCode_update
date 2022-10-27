@@ -1,8 +1,7 @@
 #include <Arduino.h>
 #include "pincfg.h"
-#include "image.h"
 #include "OledDisplay.h"
-#include "ReadTemp.h"
+#include "Temp.h"
 #include "controlPID.h"
 
 PINCFG pinconfig;
@@ -29,6 +28,8 @@ void setup() {
   oledscreen.DisplayThermal1(readtemp.ReadThermal_1());
   oledscreen.DisplayThermal2(readtemp.ReadThermal_2());
   oledscreen.DisplaySetpoint(pid.PIDvalue.Setpoint);
+  oledscreen.DisplayTableInfo();
+
 }
 
 void loop() {

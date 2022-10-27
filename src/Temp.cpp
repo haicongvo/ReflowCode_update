@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include "ReadTemp.h"
+#include "Temp.h"
 #include "pincfg.h"
 #include "controlPID.h"
 
