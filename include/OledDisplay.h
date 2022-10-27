@@ -24,13 +24,18 @@ public:
     void DisplayTimeReflowStatus(uint8_t time);
     void DisplayFanMonitor(bool enable);
     void DisplayHeatIcon(bool displayicon);
+    void DisplayModeRun(uint8_t ModeNumber);
+    void DisplayReflowModeStatus(uint8_t stage, uint8_t stage_last);
+    void DisplayTimeCount(uint16_t time);
+    void ResetTimeCount(void);
 
     struct DisplayInfo
     {
-        bool enableFanIcon = false;
+        bool EnableFanIcon = false;
     }DisplayInfo;
 private:
     bool EnableChangeFanIcon = false;
+    bool EnableBlindReflowModeStatus = false;
 };
 
 #endif

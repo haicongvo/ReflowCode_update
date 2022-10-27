@@ -4,9 +4,13 @@
 #include "OledDisplay.h"
 #include "Temp.h"
 #include "image.h"
+#include "controlPeripheral.h"
+#include "pincfg.h"
+
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 TEMP TempData;
+DEVICE devicecontrol;
 
 bool OLED::Init(void)
 {
@@ -14,7 +18,6 @@ bool OLED::Init(void)
     display.setTextColor(SSD1306_WHITE);
     display.setTextSize(1);
     display.clearDisplay();
-    display.display();
     return true;
 }
 
@@ -183,6 +186,7 @@ void OLED::DisplayTableInfo(void)
     display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_BLACK);
     display.setCursor(112, 42);
     display.print(TempData.ReflowData.RefReflowTime);
+    display.display();
 }
 
 void OLED::DisplayTimeSoakStatus(uint8_t time)
@@ -194,6 +198,7 @@ void OLED::DisplayTimeSoakStatus(uint8_t time)
     display.setCursor(112, 22);
     display.print(time);
     display.setTextColor(SSD1306_WHITE);
+    display.display();
 }
 
 void OLED::DisplayTimeReflowStatus(uint8_t time)
@@ -205,6 +210,7 @@ void OLED::DisplayTimeReflowStatus(uint8_t time)
     display.setCursor(112, 42);
     display.print(time);
     display.setTextColor(SSD1306_WHITE);
+    display.display();
 }
 
 void OLED::DisplayFanMonitor(bool enable)
@@ -220,10 +226,113 @@ void OLED::DisplayFanMonitor(bool enable)
     {
         display.drawBitmap(0, 45, cool1, 16, 16, SSD1306_WHITE);
     }
+    display.display();
 }
 
 void OLED::DisplayHeatIcon(bool displayicon)
 {
     if(displayicon) display.drawBitmap(18, 38, warning, 32, 32, SSD1306_WHITE);
     else display.fillRoundRect(18, 45, 32, 32, 0, SSD1306_BLACK);// clear display area
+    display.display();
+}
+
+void OLED::DisplayModeRun(uint8_t ModeNumber)
+{
+    //clean value on display
+    display.fillRoundRect(0, 0, 40, 7, 0, SSD1306_BLACK);
+    //Display new value
+    display.setCursor(6, 0);
+    switch(ModeNumber)
+    {
+        case 1:
+        display.print("HEATED");
+        break;
+        case 2:
+        display.print("REFLOW");
+        break;
+        default:
+        break;
+    }
+    display.display();
+}
+
+void OLED::DisplayReflowModeStatus(uint8_t stage, uint8_t stage_last)
+{
+    EnableBlindReflowModeStatus = !EnableBlindReflowModeStatus;
+    // clear display
+    if(EnableBlindReflowModeStatus)
+    {
+        switch(stage_last)
+        {
+        case 1: // HEAT
+            display.fillRoundRect(52, 12, 3, 7, 0, SSD1306_BLACK);
+            devicecontrol.ClearLed();
+            break;
+        case 2: // SOAK
+            display.fillRoundRect(52, 22, 3, 7, 0, SSD1306_BLACK);
+            devicecontrol.ClearLed();
+            break;
+        case 3: // RAMP
+            display.fillRoundRect(52, 32, 3, 7, 0, SSD1306_BLACK);
+            devicecontrol.ClearLed();
+            break;
+        case 4: // REFLOW
+            display.fillRoundRect(52, 42, 3, 7, 0, SSD1306_BLACK);
+            devicecontrol.ClearLed();
+            break;
+        case 5: // COOL
+            display.fillRoundRect(52, 52, 3, 7, 0, SSD1306_BLACK);
+            devicecontrol.ClearLed();
+            break;
+        default:
+            break;
+        }
+    }
+    // display
+    else
+    {
+        switch(stage)
+        {
+        case 1: // HEAT
+            display.fillRoundRect(52, 12, 3, 7, 0, SSD1306_WHITE);
+            devicecontrol.UpdateLedStatus(offled, onled, onled); // cyan
+            break;
+        case 2: // SOAK
+            display.fillRoundRect(52, 22, 3, 7, 0, SSD1306_WHITE);
+            devicecontrol.UpdateLedStatus(onled, onled, offled); // yellow
+            break;
+        case 3: // RAMP
+            display.fillRoundRect(52, 32, 3, 7, 0, SSD1306_WHITE);
+            devicecontrol.UpdateLedStatus(onled, offled, onled); // violet
+            break;
+        case 4: // REFLOW
+            display.fillRoundRect(52, 42, 3, 7, 0, SSD1306_WHITE);
+            devicecontrol.UpdateLedStatus(onled, offled, offled); // red
+            break;
+        case 5: // COOL
+            display.fillRoundRect(52, 52, 3, 7, 0, SSD1306_WHITE);
+            devicecontrol.UpdateLedStatus(offled, offled, onled); // blue
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void OLED::DisplayTimeCount(uint16_t time)
+{
+    display.fillRoundRect(92, 52, 28, 7, 0, SSD1306_BLACK);// clear display area
+    display.setCursor(92, 52);
+
+    uint8_t second = (uint8_t)(time % 60);
+    uint8_t minute = (uint8_t)((time / 60) % 60);
+    display.print(minute);
+    display.print(":");
+    display.print(second);
+    display.display();
+}
+
+void OLED::ResetTimeCount(void)
+{
+    DisplayTimeCount(0);
 }
