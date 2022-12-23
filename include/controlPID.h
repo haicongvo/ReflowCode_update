@@ -5,15 +5,6 @@
 
 class PID {
 public:
-    struct PIDvalue
-    {
-        float Kp = 1.2;
-        float Ki = 0.15;
-        float Kd = 2.5;
-
-        float KpTemp = 0, KiTemp = 0, KdTemp = 0;
-        float Setpoint = 30.0, CurrentTemp = 0;
-    }PIDvalue;
     
     void PID_control(void);
 private:

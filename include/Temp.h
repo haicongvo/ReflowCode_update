@@ -15,20 +15,7 @@ public:
     float ReadThermal_1(void);
     float ReadThermal_2(void);
 
-    struct ReflowData
-    {
-        uint8_t RefHeatTemp = 4;
-        uint8_t RefHeatTime = 1;
-
-        int RefSoakTemp = 150;
-        uint8_t RefSoakTime = 80;
-
-        uint8_t RefRampTemp = 4;
-        uint8_t RefRampTime = 1;
-
-        int RefReflowTemp = 250;
-        uint8_t RefReflowTime = 40;
-    }ReflowData;
+        
 private:
 };
 

@@ -1,6 +1,7 @@
 #include "pincfg.h"
 #include "controlPID.h"
 #include "Temp.h"
+#include "variableComom.h"
 
 TEMP ReadThermal;
 void PID::PID_control()
@@ -8,13 +9,13 @@ void PID::PID_control()
     // select thermal to read
     currentTemp_1 = ReadThermal.ReadThermal_1();
     currentTemp_2 = ReadThermal.ReadThermal_2();
-    if(currentTemp_1 <= 1.0) PIDvalue.CurrentTemp = currentTemp_2;
-    else PIDvalue.CurrentTemp = currentTemp_1;
+    if(currentTemp_1 <= 1.0) CurrentTemp = currentTemp_2;
+    else CurrentTemp = currentTemp_1;
 
-    E = PIDvalue.Setpoint - PIDvalue.CurrentTemp;
-    alpha = (2 * T * PIDvalue.Kp) + (PIDvalue.Ki * T * T) + (2 * PIDvalue.Kd);
-    beta = (T * T * PIDvalue.Ki) - (4 * PIDvalue.Kd) - (2 * T * PIDvalue.Kp);
-    gamman = 2 * PIDvalue.Kd;
+    E = Setpoint - CurrentTemp;
+    alpha = (2 * T * Kp) + (Ki * T * T) + (2 * Kd);
+    beta = (T * T * Ki) - (4 * Kd) - (2 * T * Kp);
+    gamman = 2 * Kd;
     Output = (alpha * E + beta * E1 + gamman * E2 + 2 * T * LastOutput) / (2 * T);
 
     LastOutput = Output;

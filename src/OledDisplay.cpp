@@ -6,11 +6,14 @@
 #include "image.h"
 #include "controlPeripheral.h"
 #include "pincfg.h"
+#include "controlPID.h"
+#include "variableComom.h"
 
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 TEMP TempData;
 DEVICE devicecontrol;
+PID pidvalue;
 
 bool OLED::Init(void)
 {
@@ -18,7 +21,14 @@ bool OLED::Init(void)
     display.setTextColor(SSD1306_WHITE);
     display.setTextSize(1);
     display.clearDisplay();
+    display.display();
     return true;
+}
+
+void OLED::ClearAllScreen(void)
+{
+    display.clearDisplay();
+    display.display();
 }
 
 void OLED::IntroScreen(void)
@@ -98,7 +108,9 @@ void OLED::MainScreen(void)
     display.drawLine(50, 50, 127, 50, SSD1306_WHITE);
     display.drawLine(50, 60, 127, 60, SSD1306_WHITE);
     //-- Draw fan icon --//
-    //Update_fan_status(false);
+    DisplayFanMonitor(false);
+    //--display run mode --//
+    DisplayModeRun(RunMode);
 
     display.display();
 }
@@ -164,28 +176,28 @@ void OLED::DisplaySetpoint(float temperature)
 void OLED::DisplayTableInfo(void)
 {
     display.setCursor(92, 12);
-    display.print(TempData.ReflowData.RefHeatTemp);
+    display.print(RefHeatTemp);
     display.setCursor(116, 12);
-    display.print(TempData.ReflowData.RefHeatTime);
+    display.print(RefHeatTime);
 
     display.setCursor(86, 22);
-    display.print(TempData.ReflowData.RefSoakTemp);
+    display.print(RefSoakTemp);
     //clean value on display
     display.fillRoundRect(109, 21, 18, 9, 0, SSD1306_BLACK);
     display.setCursor(112, 22);
-    display.print(TempData.ReflowData.RefSoakTime);
+    display.print(RefSoakTime);
 
     display.setCursor(92, 32);
-    display.print(TempData.ReflowData.RefRampTemp);
+    display.print(RefRampTemp);
     display.setCursor(116, 32);
-    display.print(TempData.ReflowData.RefRampTime);
+    display.print(RefRampTime);
 
     display.setCursor(86, 42);
-    display.print(TempData.ReflowData.RefReflowTemp);
+    display.print(RefReflowTemp);
     //clean value on display
     display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_BLACK);
     display.setCursor(112, 42);
-    display.print(TempData.ReflowData.RefReflowTime);
+    display.print(RefReflowTime);
     display.display();
 }
 
@@ -244,10 +256,10 @@ void OLED::DisplayModeRun(uint8_t ModeNumber)
     display.setCursor(6, 0);
     switch(ModeNumber)
     {
-        case 1:
+        case 0:
         display.print("HEATED");
         break;
-        case 2:
+        case 1:
         display.print("REFLOW");
         break;
         default:
@@ -256,13 +268,13 @@ void OLED::DisplayModeRun(uint8_t ModeNumber)
     display.display();
 }
 
-void OLED::DisplayReflowModeStatus(uint8_t stage, uint8_t stage_last)
+void OLED::DisplayReflowModeStatus(uint8_t stage)
 {
     EnableBlindReflowModeStatus = !EnableBlindReflowModeStatus;
     // clear display
     if(EnableBlindReflowModeStatus)
     {
-        switch(stage_last)
+        switch(LastReflowModeStatus)
         {
         case 1: // HEAT
             display.fillRoundRect(52, 12, 3, 7, 0, SSD1306_BLACK);
@@ -317,6 +329,8 @@ void OLED::DisplayReflowModeStatus(uint8_t stage, uint8_t stage_last)
             break;
         }
     }
+    LastReflowModeStatus = stage;
+    display.display();
 }
 
 void OLED::DisplayTimeCount(uint16_t time)
@@ -335,4 +349,202 @@ void OLED::DisplayTimeCount(uint16_t time)
 void OLED::ResetTimeCount(void)
 {
     DisplayTimeCount(0);
+}
+
+void OLED::DisplaySettingScreen(void)
+{
+    display.setCursor(40,0);
+    display.print("SETTING");
+    display.drawLine(0, 5, 38, 5, SSD1306_WHITE);
+    display.drawLine(84, 5, 127, 5, SSD1306_WHITE);
+    display.setCursor(10,10);
+    display.print("MODE SELECTION");
+    display.setCursor(10, 20);
+    display.print("BUZZER ON/OFF");
+    display.setCursor(10, 30);
+    display.print("FAN ON/OFF");
+    display.setCursor(10, 40);
+    display.print("P.I.D SETTING");
+    display.setCursor(10, 50);
+    display.print("P.I.D TUNNING");
+    display.display();
+}
+
+void OLED::DisplaySettingSelection(uint8_t currentselect)
+{
+    //clear display
+  switch(LastSettingSelecttion)
+  {
+    case 1:
+      display.fillRoundRect(0, 10, 7, 7, 0, SSD1306_BLACK);
+      break;
+    case 2:
+      display.fillRoundRect(0, 20, 7, 7, 0, SSD1306_BLACK);
+      break;
+    case 3:
+      display.fillRoundRect(0, 30, 7, 7, 0, SSD1306_BLACK);
+      break;
+    case 4:
+      display.fillRoundRect(0, 40, 7, 7, 0, SSD1306_BLACK);
+      break;
+    case 5:
+      display.fillRoundRect(0, 50, 7, 7, 0, SSD1306_BLACK);
+      break;
+    default:
+      break;
+  }
+  // display
+  switch(currentselect)
+  {
+    case 1:
+      display.drawTriangle(0, 10, 6, 13, 0, 16, SSD1306_WHITE);
+      break;
+    case 2:
+      display.drawTriangle(0, 20, 6, 23, 0, 26, SSD1306_WHITE);
+      break;
+    case 3:
+      display.drawTriangle(0, 30, 6, 33, 0, 36, SSD1306_WHITE);
+      break;
+    case 4:
+      display.drawTriangle(0, 40, 6, 43, 0, 46, SSD1306_WHITE);
+      break;
+    case 5:
+      display.drawTriangle(0, 50, 6, 53, 0, 56, SSD1306_WHITE);
+      break;
+    default:
+      break;
+  }
+  LastSettingSelecttion = currentselect;
+  display.display();
+}
+
+void OLED::DisplayModeSelectionScreen(void)
+{
+    display.setCursor(30,0);
+    display.print("MODE SELECT");
+    display.drawLine(0, 5, 26, 5, SSD1306_WHITE);
+    display.drawLine(98, 5, 127, 5, SSD1306_WHITE);
+
+    display.setCursor(10,10);
+    display.print("HEAT MODE");
+    display.setCursor(10,20);
+    display.print("REFLOW MODE");
+    display.setCursor(10,30);
+    display.print("CANCEL");
+    display.display();
+}
+
+void OLED::DisplayBuzzerOnOffScreen(void)
+{
+    display.setCursor(21,0);
+    display.print("BUZZER SETTING");
+    display.drawLine(0, 5, 17, 5, SSD1306_WHITE);
+    display.drawLine(109, 5, 127, 5, SSD1306_WHITE);
+
+    display.setCursor(10,10);
+    display.print("ON BUZZER");
+    display.setCursor(10,20);
+    display.print("OFF BUZZER");
+    display.setCursor(10,30);
+    display.print("CANCEL");
+    display.display();
+}
+
+void OLED::DisplayFanOnOffScreen(void)
+{
+    display.setCursor(30,0);
+    display.print("FAN SETTING");
+    display.drawLine(0, 5, 26, 5, SSD1306_WHITE);
+    display.drawLine(100, 5, 127, 5, SSD1306_WHITE);
+
+    display.setCursor(10,10);
+    display.print("AUTO");
+    display.setCursor(10,20);
+    display.print("ON FAN");
+    display.setCursor(10,30);
+    display.print("OFF FAN");
+    display.setCursor(10,40);
+    display.print("CANCEL");
+    display.display();
+}
+
+void OLED::DisplayPIDSettingScreen(void)
+{
+    display.setCursor(24,0);
+    display.print("P.I.D SETTING");
+    display.drawLine(0, 5, 20, 5, SSD1306_WHITE);
+    display.drawLine(106, 5, 127, 5, SSD1306_WHITE);
+
+    display.setCursor(10,10);
+    display.print("P Value: ");
+    display.print(Kp);
+    display.setCursor(10,20);
+    display.print("I Value: ");
+    display.print(Ki);
+    display.setCursor(10,30);
+    display.print("D Value: ");
+    display.print(Kd);
+    display.setCursor(10,40);
+    display.print("CANCEL");
+    display.display();
+}
+
+void OLED::DisplayPIDChangeValue(uint8_t CurentChangePIDValue)
+{
+    //clear display
+    switch(LastChangePIDValue)
+    {
+        case P_CHANGE: //change P value
+            display.fillRoundRect(64, 10, 100, 7, 0, SSD1306_BLACK);
+            break;
+        case I_CHANGE:// change I value
+            display.fillRoundRect(64, 20, 100, 7, 0, SSD1306_BLACK);
+            break;
+        case D_CHANGE:// change D value
+            display.fillRoundRect(64, 30, 100, 7, 0, SSD1306_BLACK);
+            break;
+        default:
+            break;
+    }
+
+    //display value
+    switch(CurentChangePIDValue)
+    {
+    case P_CHANGE:
+        display.setCursor(64,10);
+        display.print(KpTemp);
+        break;
+    case I_CHANGE:
+        display.setCursor(64,20);
+        display.print(KiTemp);
+        break;
+    case D_CHANGE:
+        display.setCursor(64,30);
+        display.print(KdTemp);
+        break;
+    default:
+        break;
+    }
+    LastChangePIDValue = CurentChangePIDValue;
+    display.display();
+}
+
+void OLED::ClearDisplayPIDValue(uint8_t choose)
+{
+    switch(choose)
+    {
+        case P_CHANGE: //change P value
+            display.fillRoundRect(64, 10, 100, 7, 0, SSD1306_BLACK);
+            break;
+        case I_CHANGE:// change I value
+            display.fillRoundRect(64, 20, 100, 7, 0, SSD1306_BLACK);
+            break;
+        case D_CHANGE:// change D value
+            display.fillRoundRect(64, 30, 100, 7, 0, SSD1306_BLACK);
+            break;
+        default:
+            break;
+    }
+    LastChangePIDValue = 0;
+    display.display();
 }

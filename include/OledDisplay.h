@@ -13,6 +13,7 @@
 class OLED {
 public:
     bool Init(void);
+    void ClearAllScreen(void);
     void IntroScreen(void);
     // display in main screen
     void MainScreen(void);
@@ -25,9 +26,18 @@ public:
     void DisplayFanMonitor(bool enable);
     void DisplayHeatIcon(bool displayicon);
     void DisplayModeRun(uint8_t ModeNumber);
-    void DisplayReflowModeStatus(uint8_t stage, uint8_t stage_last);
+    void DisplayReflowModeStatus(uint8_t stage);
     void DisplayTimeCount(uint16_t time);
     void ResetTimeCount(void);
+    // display in setting screen
+    void DisplaySettingScreen(void);
+    void DisplaySettingSelection(uint8_t currentselect);
+    void DisplayModeSelectionScreen(void);
+    void DisplayBuzzerOnOffScreen(void);
+    void DisplayFanOnOffScreen(void);
+    void DisplayPIDSettingScreen(void);
+    void DisplayPIDChangeValue(uint8_t CurentChangePIDValue);
+    void ClearDisplayPIDValue(uint8_t choose);
 
     struct DisplayInfo
     {
@@ -36,6 +46,14 @@ public:
 private:
     bool EnableChangeFanIcon = false;
     bool EnableBlindReflowModeStatus = false;
+    bool FistClearPIDValue = false;
+
+    uint8_t LastReflowModeStatus = 0;
+    
+    uint8_t LastSettingSelecttion = 0;
+
+    uint8_t LastChangePIDValue = 0;
+
 };
 
 #endif
