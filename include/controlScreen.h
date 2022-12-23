@@ -20,6 +20,8 @@ public:
     void ResetValue(void);
     void ReturnSettingScreen(void);
 
+    void SettingTableInfo(void);
+
 private:
 
     bool ScreenSettingMode = false;
@@ -33,6 +35,10 @@ private:
     float KpValueTemp = 0;
     float KiValueTemp = 0;
     float KdValueTemp = 0;
+
+    // setting table information
+    uint8_t SettingTableInfoCount = 0;
+    bool AcceptSettingTableInfo = false;
 };
 
 #endif

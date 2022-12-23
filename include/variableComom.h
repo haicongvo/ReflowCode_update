@@ -43,6 +43,10 @@ extern uint8_t RefRampTime;
 extern int RefReflowTemp;
 extern uint8_t RefReflowTime;
 
+//------ HEATER DATA ------//
+extern uint8_t HeatTemp;
+extern uint8_t HeatDelayTime;
+
 //------- SCREEN INFO -------//
 extern uint8_t SettingSelectionScreen;
 
@@ -51,6 +55,10 @@ extern uint8_t RunMode;
 extern uint8_t BuzzerMode;
 extern uint8_t FanMode;
 extern uint8_t PIDValueChangeSelect;
+
+//------- Status device ------//
+extern bool FanStatus;
+extern bool BuzzerStatus;
 
 enum MODECONTROL {
     HEATER_MODE,
@@ -72,6 +80,11 @@ enum PIDVALUESETTING {
     P_CHANGE = 1,
     I_CHANGE = 2,
     D_CHANGE = 3
+};
+
+enum CONTROL {
+    OFF,
+    ON
 };
 
 #endif

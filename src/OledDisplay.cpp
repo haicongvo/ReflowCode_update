@@ -83,16 +83,24 @@ void OLED::MainScreen(void)
     display.setCursor(116, 2);
     display.print("S");
     //-- STAGE --//
-    display.setCursor(58, 12);
-    display.print("HEAT");
-    display.setCursor(58, 22);
-    display.print("SOAK");
-    display.setCursor(58, 32);
-    display.print("RAMP");
-    display.setCursor(58, 42);
-    display.print("RELF");
-    display.setCursor(58, 52);
-    display.print("COOL");
+    if(RunMode == REFLOW_MODE)
+    {
+        display.setCursor(58, 12);
+        display.print("HEAT");
+        display.setCursor(58, 22);
+        display.print("SOAK");
+        display.setCursor(58, 32);
+        display.print("RAMP");
+        display.setCursor(58, 42);
+        display.print("RELF");
+        display.setCursor(58, 52);
+        display.print("COOL");
+    }
+    else if(RunMode == HEATER_MODE)
+    {
+        display.setCursor(58, 12);
+        display.print("HEAT");
+    }
     //-- Draw vertical line --//
     display.drawLine(50, 0, 50, 59, SSD1306_WHITE);
     display.drawLine(56, 10, 56, 59, SSD1306_WHITE);
@@ -175,29 +183,39 @@ void OLED::DisplaySetpoint(float temperature)
 
 void OLED::DisplayTableInfo(void)
 {
-    display.setCursor(92, 12);
-    display.print(RefHeatTemp);
-    display.setCursor(116, 12);
-    display.print(RefHeatTime);
+    if(RunMode == REFLOW_MODE)
+    {
+        display.setCursor(92, 12);
+        display.print(RefHeatTemp);
+        display.setCursor(116, 12);
+        display.print(RefHeatTime);
 
-    display.setCursor(86, 22);
-    display.print(RefSoakTemp);
-    //clean value on display
-    display.fillRoundRect(109, 21, 18, 9, 0, SSD1306_BLACK);
-    display.setCursor(112, 22);
-    display.print(RefSoakTime);
+        display.setCursor(86, 22);
+        display.print(RefSoakTemp);
+        //clean value on display
+        display.fillRoundRect(109, 21, 18, 9, 0, SSD1306_BLACK);
+        display.setCursor(112, 22);
+        display.print(RefSoakTime);
 
-    display.setCursor(92, 32);
-    display.print(RefRampTemp);
-    display.setCursor(116, 32);
-    display.print(RefRampTime);
+        display.setCursor(92, 32);
+        display.print(RefRampTemp);
+        display.setCursor(116, 32);
+        display.print(RefRampTime);
 
-    display.setCursor(86, 42);
-    display.print(RefReflowTemp);
-    //clean value on display
-    display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_BLACK);
-    display.setCursor(112, 42);
-    display.print(RefReflowTime);
+        display.setCursor(86, 42);
+        display.print(RefReflowTemp);
+        //clean value on display
+        display.fillRoundRect(109, 41, 18, 9, 0, SSD1306_BLACK);
+        display.setCursor(112, 42);
+        display.print(RefReflowTime);
+    }
+    else if(RunMode == HEATER_MODE)
+    {
+        display.setCursor(92, 12);
+        display.print(HeatTemp);
+        display.setCursor(116, 12);
+        display.print(HeatDelayTime);
+    }
     display.display();
 }
 

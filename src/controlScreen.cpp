@@ -339,3 +339,35 @@ void DISPLAYSCREEN::ReturnSettingScreen(void)
     oled.DisplaySettingScreen();
     oled.DisplaySettingSelection(SettingSelection);
 }
+
+void DISPLAYSCREEN::SettingTableInfo(void)
+{
+    if(!ScreenSettingMode && OKButtonPress)
+    {
+        OKButtonPress = false;
+        SettingTableInfoCount ++;
+        AcceptSettingTableInfo = true;
+
+        if(RunMode == HEATER_MODE)
+        {
+            if(SettingTableInfoCount > 1) 
+            {
+                SettingTableInfoCount = 0;
+                AcceptSettingTableInfo = false;
+            }
+        }
+        else if(RunMode == REFLOW_MODE)
+        {
+            if(SettingTableInfoCount > 8) 
+            {
+                SettingTableInfoCount = 0;
+                AcceptSettingTableInfo = false;
+            }
+        }
+    }
+
+    if(!ScreenSettingMode && AcceptSettingTableInfo)
+    {
+        
+    }
+}

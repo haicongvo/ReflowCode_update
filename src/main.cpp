@@ -51,6 +51,10 @@ uint8_t RefRampTime = 1;
 int RefReflowTemp = 250;
 uint8_t RefReflowTime = 40;
 
+// heat data
+uint8_t HeatTemp = 260;
+uint8_t HeatDelayTime = 50;
+
 //screen info
 uint8_t SettingSelectionScreen = 1;
 
@@ -59,6 +63,10 @@ uint8_t RunMode = HEATER_MODE;
 uint8_t BuzzerMode = BUZZER_OFF;
 uint8_t FanMode = FAN_OFF;
 uint8_t PIDValueChangeSelect = 0;
+
+// device status
+bool FanStatus = OFF;
+bool BuzzerStatus = OFF;
 
 void setup() {
   // put your setup code here, to run once:
